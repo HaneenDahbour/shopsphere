@@ -1,5 +1,8 @@
+
 from flask import Flask, render_template, request, redirect, url_for
 from db import get_table, add_product, get_all_products, get_product, update_product, delete_product, add_review, get_reviews
+
+
 app = Flask(__name__)
 
 @app.route('/')
@@ -24,8 +27,26 @@ def add():
 @app.route('/product/<product_id>')
 def product_detail(product_id):
     product = get_product(product_id)
-    return render_template('product.html', product=product)
 
+    if product is None:
+        return "Product not found", 404
+
+    reviews = get_reviews(product_id)
+
+    reviews = sorted(reviews, key=lambda r: r['timestamp'], reverse=True)
+
+    if len(reviews) > 0:
+        total = sum(int(review['rating']) for review in reviews)
+        average_rating = round(total / len(reviews), 1)
+    else:
+        average_rating = None
+
+    return render_template(
+        'product.html',
+        product=product,
+        reviews=reviews,
+        average_rating=average_rating
+    )
 @app.route('/edit/<product_id>', methods=['GET', 'POST'])
 def edit(product_id):
     product = get_product(product_id)
