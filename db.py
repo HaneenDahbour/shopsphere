@@ -5,8 +5,8 @@ from dotenv import load_dotenv
 from boto3.dynamodb.conditions import Attr, Key
 from datetime import datetime
 
-load_dotenv()
 
+load_dotenv(override=True)
 def get_table():
     dynamodb = boto3.resource(
         'dynamodb',
