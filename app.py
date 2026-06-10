@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for
-from db import get_table, add_product, get_all_products, get_product, update_product, delete_product
-
+from db import get_table, add_product, get_all_products, get_product, update_product, delete_product, add_review, get_reviews
 app = Flask(__name__)
 
 @app.route('/')
@@ -47,6 +46,16 @@ def edit(product_id):
 def delete(product_id):
     delete_product(product_id)
     return redirect(url_for('home'))
+
+@app.route('/review/<product_id>', methods=['POST'])
+def add_review_route(product_id):
+    add_review(
+        product_id=product_id,
+        customer_name=request.form['customer_name'],
+        rating=request.form['rating'],
+        comment=request.form['comment']
+    )
+    return redirect(url_for('product_detail', product_id=product_id))
 
 if __name__ == '__main__':
     app.run(debug=True)

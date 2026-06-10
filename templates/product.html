@@ -5,18 +5,67 @@
 </head>
 <body>
     <a href="/">← Back to Catalog</a>
+
     <h1>{{ product.name }}</h1>
+
     <p>Category: {{ product.category }}</p>
     <p>Description: {{ product.description }}</p>
     <p>Price: ${{ product.price }}</p>
     <p>Stock: {{ product.stock }}</p>
+
     {% if product.image_url %}
         <img src="{{ product.image_url }}" width="200">
     {% endif %}
 
     <br><br>
+
     <a href="/edit/{{ product.product_id }}">Edit Product</a>
     &nbsp;
     <a href="/delete/{{ product.product_id }}" onclick="return confirm('Are you sure?')">Delete Product</a>
+
+    <hr>
+
+    <h2>Customer Reviews</h2>
+
+    {% if average_rating %}
+        <p>Average Rating: {{ average_rating }} / 5</p>
+    {% else %}
+        <p>No reviews yet.</p>
+    {% endif %}
+
+    <h3>Add a Review</h3>
+
+    <form method="POST" action="/review/{{ product.product_id }}">
+        <label>Your Name:</label><br>
+        <input type="text" name="customer_name" required><br><br>
+
+        <label>Rating:</label><br>
+        <select name="rating" required>
+            <option value="5">5 - Excellent</option>
+            <option value="4">4 - Good</option>
+            <option value="3">3 - Average</option>
+            <option value="2">2 - Poor</option>
+            <option value="1">1 - Bad</option>
+        </select><br><br>
+
+        <label>Comment:</label><br>
+        <textarea name="comment" required></textarea><br><br>
+
+        <button type="submit">Submit Review</button>
+    </form>
+
+    <hr>
+
+    <h3>All Reviews</h3>
+
+    {% for review in reviews %}
+        <div>
+            <p><strong>{{ review.customer_name }}</strong></p>
+            <p>Rating: {{ review.rating }} / 5</p>
+            <p>{{ review.comment }}</p>
+            <p>Date: {{ review.timestamp }}</p>
+        </div>
+        <hr>
+    {% endfor %}
 </body>
 </html>

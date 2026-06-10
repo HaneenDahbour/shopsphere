@@ -3,6 +3,8 @@ import os
 import uuid
 from dotenv import load_dotenv
 from boto3.dynamodb.conditions import Attr
+from boto3.dynamodb.conditions import Attr, Key
+from datetime import datetime
 
 load_dotenv()
 
@@ -69,3 +71,23 @@ def delete_product(product_id):
         'PK': f'PRODUCT#{product_id}',
         'SK': 'METADATA'
     })
+    
+def add_review(product_id, customer_name, rating, comment):
+    table = get_table()
+    timestamp = datetime.utcnow().isoformat()
+    table.put_item(Item={
+        'PK': f'PRODUCT#{product_id}',
+        'SK': f'REVIEW#{timestamp}',
+        'product_id': product_id,
+        'customer_name': customer_name,
+        'rating': int(rating),
+        'comment': comment,
+        'timestamp': timestamp
+    })
+
+def get_reviews(product_id):
+    table = get_table()
+    response = table.query(
+        KeyConditionExpression=Key('PK').eq(f'PRODUCT#{product_id}') & Key('SK').begins_with('REVIEW#')
+    )
+    return response['Items']
