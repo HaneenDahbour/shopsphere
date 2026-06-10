@@ -2,7 +2,6 @@ import boto3
 import os
 import uuid
 from dotenv import load_dotenv
-from boto3.dynamodb.conditions import Attr
 from boto3.dynamodb.conditions import Attr, Key
 from datetime import datetime
 
@@ -90,4 +89,14 @@ def get_reviews(product_id):
     response = table.query(
         KeyConditionExpression=Key('PK').eq(f'PRODUCT#{product_id}') & Key('SK').begins_with('REVIEW#')
     )
+    return response['Items']
+
+def get_products_by_category(category):
+    table = get_table()
+
+    response = table.query(
+        IndexName='category-index',
+        KeyConditionExpression=Key('category').eq(category)
+    )
+
     return response['Items']

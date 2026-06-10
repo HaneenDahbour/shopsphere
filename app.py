@@ -1,14 +1,23 @@
 
 from flask import Flask, render_template, request, redirect, url_for
-from db import get_table, add_product, get_all_products, get_product, update_product, delete_product, add_review, get_reviews
-
+from db import get_table, add_product, get_all_products, get_product, update_product, delete_product, add_review, get_reviews, get_products_by_category
 
 app = Flask(__name__)
 
 @app.route('/')
 def home():
-    products = get_all_products()
-    return render_template('index.html', products=products)
+    category = request.args.get('category')
+
+    if category:
+        products = get_products_by_category(category)
+    else:
+        products = get_all_products()
+
+    return render_template(
+        'index.html',
+        products=products,
+        selected_category=category
+    )
 
 @app.route('/add', methods=['GET', 'POST'])
 def add():

@@ -5,16 +5,75 @@
 </head>
 <body>
     <h1>ShopSphere - Product Catalog</h1>
+
     <a href="/add">+ Add New Product</a>
+
     <hr>
-    {% for product in products %}
-        <div>
-            <h3>{{ product.name }}</h3>
-            <p>Category: {{ product.category }}</p>
-            <p>Price: ${{ product.price }}</p>
-            <a href="/product/{{ product.product_id }}">View Details</a>
-        </div>
-        <hr>
-    {% endfor %}
+
+    <h3>Live Category Search</h3>
+
+    <input 
+        type="text" 
+        id="categorySearch" 
+        placeholder="Type category letter, example: s"
+    >
+
+    <p>This filters the visible products while typing.</p>
+
+    <hr>
+
+    <h3>Filter by Exact Category using DynamoDB GSI</h3>
+
+    <form method="GET" action="/">
+        <input 
+            type="text" 
+            name="category" 
+            placeholder="Example: Electronics"
+            value="{{ selected_category or '' }}"
+        >
+        <button type="submit">Filter with GSI</button>
+        <a href="/">Show All</a>
+    </form>
+
+    <hr>
+
+    {% if selected_category %}
+        <h2>Products in category: {{ selected_category }}</h2>
+    {% else %}
+        <h2>All Products</h2>
+    {% endif %}
+
+    {% if products %}
+        {% for product in products %}
+            <div class="product-card" data-category="{{ product.category }}">
+                <h3>{{ product.name }}</h3>
+                <p>Category: {{ product.category }}</p>
+                <p>Price: ${{ product.price }}</p>
+                <a href="/product/{{ product.product_id }}">View Details</a>
+            </div>
+            <hr class="product-line">
+        {% endfor %}
+    {% else %}
+        <p>No products found.</p>
+    {% endif %}
+
+    <script>
+        const searchInput = document.getElementById("categorySearch");
+        const productCards = document.querySelectorAll(".product-card");
+
+        searchInput.addEventListener("input", function () {
+            const searchText = searchInput.value.toLowerCase();
+
+            productCards.forEach(function (card) {
+                const category = card.dataset.category.toLowerCase();
+
+                if (category.includes(searchText)) {
+                    card.style.display = "block";
+                } else {
+                    card.style.display = "none";
+                }
+            });
+        });
+    </script>
 </body>
 </html>
